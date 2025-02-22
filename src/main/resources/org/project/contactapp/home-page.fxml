@@ -1,16 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.project.contactapp.HomePageController">
+<VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: #f4f4f4;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.project.contactapp.controllers.HomePageController">
+
   <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="50.0"/>
   </padding>
 
-  <Label fx:id="welcomeText"/>
-  <Button text="Hello!" onAction="#onHelloButtonClick"/>
+  <!-- Title -->
+  <Label text="My Contacts" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+
+  <!-- Subtitle -->
+  <Label text="Keep all your contacts organized" style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+
+  <!-- Action Buttons -->
+  <Button text="View Contacts" onAction="#onViewContactsClick"
+          style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 14px;"/>
+
+  <Button text="Add Contact" onAction="#onAddContactClick"
+          style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px;"/>
+
 </VBox>
+
+
+
+
+        <!--<?xml version="1.0" encoding="UTF-8"?>-->
+
+        <!--<?import javafx.geometry.Insets?>-->
+        <!--<?import javafx.geometry.Pos?>-->
+        <!--<?import javafx.scene.control.Button?>-->
+        <!--<?import javafx.scene.control.Label?>-->
+        <!--<?import javafx.scene.control.ListView?>-->
+        <!--<?import javafx.scene.control.TextField?>-->
+        <!--<?import javafx.scene.layout.HBox?>-->
+        <!--<?import javafx.scene.layout.VBox?>-->
+        <!--<?import javafx.scene.text.Font?>-->
+
+        <!--<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"-->
+        <!--      fx:controller="org.project.contactapp.controllers.HomePageController">-->
+        <!--  <padding>-->
+        <!--    <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>-->
+        <!--  </padding>-->
+
+        <!--  &lt;!&ndash; App Title &ndash;&gt;-->
+        <!--  <Label text="Contact App" >-->
+        <!--    <font>-->
+        <!--      <Font name="Arial" size="24.0"/>-->
+        <!--    </font>-->
+        <!--  </Label>-->
+
+        <!--  &lt;!&ndash; Search Bar &ndash;&gt;-->
+        <!--  <HBox alignment="CENTER_LEFT" spacing="10.0">-->
+        <!--    <TextField fx:id="searchField" promptText="Search contacts..." prefWidth="200.0"/>-->
+        <!--    <Button text="Search" />-->
+        <!--  </HBox>-->
+
+        <!--  &lt;!&ndash; Contact List &ndash;&gt;-->
+        <!--  <ListView fx:id="contactList" prefHeight="300.0" prefWidth="260.0"/>-->
+
+        <!--  &lt;!&ndash; Add Contact Button &ndash;&gt;-->
+        <!--  <Button text="Add New Contact" prefWidth="260.0">-->
+        <!--    <font>-->
+        <!--      <Font name="Arial" size="14.0"/>-->
+        <!--    </font>-->
+        <!--  </Button>-->
+        <!--</VBox>-->

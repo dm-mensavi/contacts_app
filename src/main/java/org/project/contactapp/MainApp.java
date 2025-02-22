@@ -13,6 +13,7 @@ public class MainApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("home-page.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 300, 500);
         stage.setTitle("Hello!");
+
         stage.setScene(scene);
         stage.show();
     }

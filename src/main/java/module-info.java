@@ -8,4 +8,6 @@ module org.project.contactapp {
 
     opens org.project.contactapp to javafx.fxml;
     exports org.project.contactapp;
+    exports org.project.contactapp.controllers;
+    opens org.project.contactapp.controllers to javafx.fxml;
 }
