@@ -55,13 +55,31 @@
     </VBox>
 
     <!-- Save and Cancel Buttons -->
+<!--    <HBox alignment="CENTER" spacing="10.0">-->
+<!--        <Button text="Save"  prefWidth="120.0"  style="-fx-background-color: #0078D7;">-->
+<!--            <font>-->
+<!--                <Font name="Arial" size="14.0"/>-->
+<!--            </font>-->
+<!--        </Button>-->
+<!--        <Button text="Cancel"  prefWidth="120.0"  style="-fx-background-color: #999111; -fx-color: white;">-->
+<!--            <font>-->
+<!--                <Font name="Arial" size="14.0"/>-->
+<!--            </font>-->
+<!--        </Button>-->
+<!--    </HBox>-->
+
     <HBox alignment="CENTER" spacing="10.0">
-        <Button text="Save"  prefWidth="120.0"  style="-fx-background-color: #0078D7;">
+        <Button text="Save" prefWidth="120.0" style="-fx-background-color: #0078D7;" onAction="#onSaveContactClick">
             <font>
                 <Font name="Arial" size="14.0"/>
             </font>
         </Button>
-        <Button text="Cancel"  prefWidth="120.0"  style="-fx-background-color: #999111; -fx-color: white;">
+        <Button text="Cancel" prefWidth="120.0" style="-fx-background-color: #999111; -fx-color: white;" onAction="#onCancelClick">
+            <font>
+                <Font name="Arial" size="14.0"/>
+            </font>
+        </Button>
+        <Button text="Back" prefWidth="120.0" style="-fx-background-color: #666666; -fx-text-fill: white;" onAction="#onBackClick">
             <font>
                 <Font name="Arial" size="14.0"/>
             </font>
