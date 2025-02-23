@@ -84,6 +84,8 @@
 
 package org.project.contactapp.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
@@ -95,6 +97,7 @@ import org.project.contactapp.entities.Person;
 import org.project.contactapp.daos.PersonDAO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AllContactsController {
 
@@ -119,6 +122,8 @@ public class AllContactsController {
     @FXML
     private Button addContactButton; // Button to navigate to the Add Contact page
 
+
+    private ObservableList<Person> allContacts;
     // Initialize the controller
     @FXML
     public void initialize() {
@@ -133,7 +138,12 @@ public class AllContactsController {
         // Set up event handlers
 //        backButton.setOnAction(event -> onBackClick());
 //        addContactButton.setOnAction(event -> onAddContactClick());
-        contactTable.getItems().setAll(PersonDAO.getAllPersons());
+        allContacts = FXCollections.observableArrayList(PersonDAO.getAllPersons());
+        contactTable.setItems(allContacts);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            onSearchClick(); // Trigger search on text change
+        });
     }
 
     // Load all contacts from the database into the TableView
@@ -164,19 +174,22 @@ public class AllContactsController {
 
     // Handle the Search button click
     @FXML
-    private void onSearchClick() {
-//        String searchTerm = searchField.getText().trim(); // Get the search term
-//        if (!searchTerm.isEmpty()) {
-//            try {
-//                List<Person> filteredContacts = PersonDAO.searchContacts(searchTerm); // Search contacts
-//                contactTable.getItems().clear(); // Clear the TableView
-//                contactTable.getItems().addAll(filteredContacts); // Add filtered contacts to the TableView
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                System.err.println("Failed to search contacts.");
-//            }
-//        } else {
-//            loadContacts(); // Reload all contacts if the search term is empty
-//        }
+    protected void onSearchClick() {
+        String query = searchField.getText().trim().toLowerCase(); // Get the search query
+
+        if (query.isEmpty()) {
+            // If the search query is empty, show all contacts
+            contactTable.setItems(allContacts);
+        } else {
+            // Filter the contacts based on the search query
+            List<Person> filteredContacts = allContacts.stream()
+                    .filter(person -> person.getFirstname().toLowerCase().contains(query) ||
+                            person.getLastname().toLowerCase().contains(query) ||
+                            person.getPhone_number().toLowerCase().contains(query))
+                    .collect(Collectors.toList());
+
+            // Update the TableView with the filtered results
+            contactTable.setItems(FXCollections.observableArrayList(filteredContacts));
+        }
     }
 }
