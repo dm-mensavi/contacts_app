@@ -103,4 +103,37 @@ public  class  PersonDAO {
             return false; // Return false if an error occurred
         }
     }
+
+    /**
+     * Updates an existing person in the database.
+     *
+     * @param person The person to update.
+     * @return True if the update was successful, false otherwise.
+     */
+    public static boolean updatePerson(Person person) {
+        String query = "UPDATE person SET lastname = ?, firstname = ?, nickname = ?, phone_number = ?, " +
+                "address = ?, email_address = ?, birth_date = ? WHERE id = ?";
+
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            // Set parameters for the query
+            preparedStatement.setString(1, person.getLastname());
+            preparedStatement.setString(2, person.getFirstname());
+            preparedStatement.setString(3, person.getNickname());
+            preparedStatement.setString(4, person.getPhone_number());
+            preparedStatement.setString(5, person.getAddress());
+            preparedStatement.setString(6, person.getEmail_address());
+            preparedStatement.setDate(7, java.sql.Date.valueOf(person.getBirth_date()));
+            preparedStatement.setInt(8, person.getId());
+
+            // Execute the query
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0; // Return true if the update was successful
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurred
+        }
+    }
 }

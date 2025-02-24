@@ -87,14 +87,14 @@ package org.project.contactapp.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import org.project.contactapp.MainApp;
-import org.project.contactapp.entities.Person;
 import org.project.contactapp.daos.PersonDAO;
+import org.project.contactapp.entities.Person;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -116,11 +116,11 @@ public class AllContactsController {
     @FXML
     private TextField searchField; // Search bar for filtering contacts
 
-    @FXML
-    private Button backButton; // Back button to return to the homepage
-
-    @FXML
-    private Button addContactButton; // Button to navigate to the Add Contact page
+//    @FXML
+//    private Button backButton; // Back button to return to the homepage
+//
+//    @FXML
+//    private Button addContactButton; // Button to navigate to the Add Contact page
 
 
     private ObservableList<Person> allContacts;
@@ -144,6 +144,8 @@ public class AllContactsController {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             onSearchClick(); // Trigger search on text change
         });
+
+        contactTable.setOnMouseClicked(this::handleRowDoubleClick);
     }
 
     // Load all contacts from the database into the TableView
@@ -190,6 +192,17 @@ public class AllContactsController {
 
             // Update the TableView with the filtered results
             contactTable.setItems(FXCollections.observableArrayList(filteredContacts));
+        }
+    }
+
+
+    private void handleRowDoubleClick(MouseEvent event) {
+        if (event.getClickCount() == 2) { // Check for double-click
+            Person selectedContact = contactTable.getSelectionModel().getSelectedItem();
+            if (selectedContact != null) {
+                // Navigate to the detailed view page and pass the selected contact
+                MainApp.navigateTo("contact-details.fxml", selectedContact);
+            }
         }
     }
 }
