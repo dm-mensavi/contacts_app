@@ -1,131 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+    <?import javafx.geometry.Insets?>
+    <?import javafx.geometry.Pos?>
+    <?import javafx.scene.control.Button?>
+    <?import javafx.scene.control.Label?>
+    <?import javafx.scene.control.TableColumn?>
+    <?import javafx.scene.control.TableView?>
+    <?import javafx.scene.control.TextField?>
+    <?import javafx.scene.control.cell.PropertyValueFactory?>
+    <?import javafx.scene.layout.HBox?>
+    <?import javafx.scene.layout.VBox?>
+    <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.project.contactapp.controllers.AllContactsController">
-  <padding>
-    <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
-  </padding>
+    <VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="org.project.contactapp.controllers.AllContactsController">
+      <padding>
+        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+      </padding>
 
-  <!-- App Title -->
-  <Label text="Contact App">
-    <font>
-      <Font name="Arial" size="24.0"/>
-    </font>
-  </Label>
+      <!-- App Title -->
+      <Label text="Contact App">
+        <font>
+          <Font name="Arial" size="24.0"/>
+        </font>
+      </Label>
 
-  <!-- Search Bar -->
-  <HBox alignment="CENTER_LEFT" spacing="10.0">
-    <TextField fx:id="searchField" promptText="Search contacts..." prefWidth="200.0"/>
-    <Button text="Search" onAction="#onSearchClick"/>
-  </HBox>
+      <!-- Search Bar -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <TextField fx:id="searchField" promptText="Search contacts..." prefWidth="200.0"/>
+        <Button text="Search" onAction="#onSearchClick"/>
+      </HBox>
 
-  <!-- Contact Table -->
-  <TableView fx:id="contactTable" prefHeight="300.0" prefWidth="250.0">
-    <columns>
-      <!-- First Name Column -->
-      <TableColumn fx:id="firstNameColumn" text="First Name" prefWidth="80.0">
-        <cellValueFactory>
-          <PropertyValueFactory property="firstname"/>
-        </cellValueFactory>
-      </TableColumn>
+      <!-- Contact Table -->
+      <TableView fx:id="contactTable" prefHeight="300.0" prefWidth="250.0">
+        <columns>
+          <!-- First Name Column -->
+          <TableColumn fx:id="firstNameColumn" text="First Name" prefWidth="80.0">
+            <cellValueFactory>
+              <PropertyValueFactory property="firstname"/>
+            </cellValueFactory>
+          </TableColumn>
 
-      <!-- Last Name Column -->
-      <TableColumn fx:id="lastNameColumn" text="Last Name" prefWidth="80.0">
-        <cellValueFactory>
-          <PropertyValueFactory property="lastname"/>
-        </cellValueFactory>
-      </TableColumn>
+          <!-- Last Name Column -->
+          <TableColumn fx:id="lastNameColumn" text="Last Name" prefWidth="80.0">
+            <cellValueFactory>
+              <PropertyValueFactory property="lastname"/>
+            </cellValueFactory>
+          </TableColumn>
 
-      <!-- Phone Number Column -->
-      <TableColumn fx:id="phoneNumberColumn" text="Phone Number" prefWidth="80.0">
-        <cellValueFactory>
-          <PropertyValueFactory property="phone_number"/>
-        </cellValueFactory>
-      </TableColumn>
-    </columns>
-  </TableView>
+          <!-- Phone Number Column -->
+          <TableColumn fx:id="phoneNumberColumn" text="Phone Number" prefWidth="80.0">
+            <cellValueFactory>
+              <PropertyValueFactory property="phone_number"/>
+            </cellValueFactory>
+          </TableColumn>
+        </columns>
+      </TableView>
 
-  <!-- Add Contact and Back Buttons -->
-  <HBox alignment="CENTER" spacing="10.0">
-    <Button fx:id="addContactButton" text="Add New Contact" prefWidth="260.0" onAction="#onAddContactClick">
-      <font>
-        <Font name="Arial" size="14.0"/>
-      </font>
-    </Button>
-    <Button fx:id="backButton" text="Back" prefWidth="260.0" onAction="#onBackClick">
-      <font>
-        <Font name="Arial" size="14.0"/>
-      </font>
-    </Button>
-  </HBox>
-</VBox>
-
-
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-
-<!--<?import javafx.geometry.Insets?>-->
-<!--<?import javafx.geometry.Pos?>-->
-<!--<?import javafx.scene.control.Button?>-->
-<!--<?import javafx.scene.control.Label?>-->
-<!--<?import javafx.scene.control.ListView?>-->
-<!--<?import javafx.scene.control.TextField?>-->
-<!--<?import javafx.scene.layout.HBox?>-->
-<!--<?import javafx.scene.layout.VBox?>-->
-<!--<?import javafx.scene.text.Font?>-->
-
-<!--<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"-->
-<!--      fx:controller="org.project.contactapp.controllers.AllContactsController">-->
-<!--  <padding>-->
-<!--    <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>-->
-<!--  </padding>-->
-
-<!--  &lt;!&ndash; App Title &ndash;&gt;-->
-<!--  <Label text="Contact App" >-->
-<!--    <font>-->
-<!--      <Font name="Arial" size="24.0"/>-->
-<!--    </font>-->
-<!--  </Label>-->
-
-<!--  &lt;!&ndash; Search Bar &ndash;&gt;-->
-<!--  <HBox alignment="CENTER_LEFT" spacing="10.0">-->
-<!--    <TextField fx:id="searchField" promptText="Search contacts..." prefWidth="200.0"/>-->
-<!--    <Button text="Search" />-->
-<!--  </HBox>-->
-
-<!--  &lt;!&ndash; Column Headers &ndash;&gt;-->
-<!--  <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-padding: 5;">-->
-<!--    <Label text="First Name" prefWidth="100.0" style="-fx-font-weight: bold;"/>-->
-<!--    <Label text="Last Name" prefWidth="100.0" style="-fx-font-weight: bold;"/>-->
-<!--    <Label text="Phone Number" prefWidth="100.0" style="-fx-font-weight: bold;"/>-->
-<!--  </HBox>-->
-
-<!--  &lt;!&ndash; Contact List &ndash;&gt;-->
-<!--  <ListView fx:id="contactList" prefHeight="300.0" prefWidth="260.0"/>-->
-
-<!--  &lt;!&ndash; Add Contact Button &ndash;&gt;-->
-<!--  <HBox alignment="CENTER" spacing="10.0">-->
-<!--    <Button fx:id="backButton" text="Back" prefWidth="260.0" onAction="#onBackClick">-->
-<!--      <font>-->
-<!--        <Font name="Arial" size="14.0"/>-->
-<!--      </font>-->
-<!--    </Button>-->
-
-<!--    <Button fx:id="addContactButton" text="Add New Contact" prefWidth="260.0" onAction="#onAddContactClick">-->
-<!--      <font>-->
-<!--        <Font name="Arial" size="14.0"/>-->
-<!--      </font>-->
-<!--    </Button>-->
-<!--  </HBox>-->
-<!--</VBox>-->
+      <!-- Add Contact and Back Buttons -->
+      <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="addContactButton" text="Add New Contact" prefWidth="260.0" onAction="#onAddContactClick">
+            <font>
+                <Font name="Arial" size="14.0"/>
+            </font>
+        </Button>
+        <Button fx:id="deleteContactButton" text="Delete" prefWidth="260.0" onAction="#onDeleteContactClick" disable="true">
+            <font>
+                <Font name="Arial" size="14.0"/>
+            </font>
+        </Button>
+        <Button fx:id="backButton" text="Back" prefWidth="260.0" onAction="#onBackClick">
+            <font>
+                <Font name="Arial" size="14.0"/>
+            </font>
+        </Button>
+      </HBox>
+    </VBox>
