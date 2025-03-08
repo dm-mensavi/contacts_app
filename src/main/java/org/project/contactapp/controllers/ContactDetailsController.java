@@ -3,11 +3,11 @@ package org.project.contactapp.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.project.contactapp.MainApp;
 import org.project.contactapp.daos.PersonDAO;
 import org.project.contactapp.entities.Person;
-
-import java.time.LocalDate;
 
 public class ContactDetailsController {
 
@@ -32,8 +32,10 @@ public class ContactDetailsController {
     @FXML
     private DatePicker birthDateField;
 
+    @FXML
+    private ImageView imageView;
+
     private Person selectedContact; // The contact being edited
-    private boolean isEditing = false; // Track whether we're in edit mode
 
     @FXML
     public void initialize() {
@@ -41,11 +43,6 @@ public class ContactDetailsController {
         setEditable(true);
     }
 
-    /**
-     * Sets the selected contact and populates the fields.
-     *
-     * @param contact The contact to display/edit.
-     */
     public void setSelectedContact(Person contact) {
         this.selectedContact = contact;
 
@@ -56,20 +53,14 @@ public class ContactDetailsController {
         phoneNumberField.setText(selectedContact.getPhone_number());
         addressField.setText(selectedContact.getAddress());
         emailAddressField.setText(selectedContact.getEmail_address());
+        birthDateField.setValue(selectedContact.getBirth_date());
 
-        // Format the birth date (if not null)
-        if (selectedContact.getBirth_date() != null) {
-            birthDateField.setValue(selectedContact.getBirth_date());
-        } else {
-            birthDateField.setValue(null);
+        // Load the image if the path is not null or empty
+        if (selectedContact.getImage_path() != null && !selectedContact.getImage_path().isEmpty()) {
+            imageView.setImage(new Image("file:" + selectedContact.getImage_path()));
         }
     }
 
-    /**
-     * Enables or disables editing for all fields.
-     *
-     * @param editable Whether the fields should be editable.
-     */
     private void setEditable(boolean editable) {
         lastNameField.setEditable(editable);
         firstNameField.setEditable(editable);
@@ -80,12 +71,8 @@ public class ContactDetailsController {
         birthDateField.setDisable(!editable);
     }
 
-    /**
-     * Handles the Save button click.
-     */
     @FXML
     protected void onSaveClick() {
-        // Update the selected contact with the new data
         selectedContact.setLastname(lastNameField.getText());
         selectedContact.setFirstname(firstNameField.getText());
         selectedContact.setNickname(nicknameField.getText());
@@ -94,32 +81,23 @@ public class ContactDetailsController {
         selectedContact.setEmail_address(emailAddressField.getText());
         selectedContact.setBirth_date(birthDateField.getValue());
 
-        // Save the updated contact to the database
         boolean success = PersonDAO.updatePerson(selectedContact);
 
         if (success) {
             System.out.println("Contact updated successfully!");
-            MainApp.navigateTo("allContacts-page.fxml"); // Navigate back to the all contacts page
+            MainApp.navigateTo("allContacts-page.fxml");
         } else {
             System.out.println("Failed to update contact.");
         }
     }
 
-    /**
-     * Handles the Cancel button click.
-     */
     @FXML
     protected void onCancelClick() {
-        // Reset the fields to the original values
         setSelectedContact(selectedContact);
     }
 
-    /**
-     * Handles the Back button click.
-     */
     @FXML
     protected void onBackClick() {
-        System.out.println("Back Clicked!");
-        MainApp.navigateTo("allContacts-page.fxml"); // Navigate back to the all contacts page
+        MainApp.navigateTo("allContacts-page.fxml");
     }
 }

@@ -11,6 +11,7 @@ public class Person {
     private String address;
     private String email_address;
     private LocalDate birth_date;
+    private String image_path;
 
     public Person(){}
 
@@ -95,6 +96,15 @@ public class Person {
 
     public void setBirth_date(LocalDate birth_date) {
         this.birth_date = birth_date;
+    }
+
+    // Getters and Setters
+    public String getImage_path() {
+        return image_path;
+    }
+
+    public void setImage_path(String image_path) {
+        this.image_path = image_path;
     }
 
     @Override

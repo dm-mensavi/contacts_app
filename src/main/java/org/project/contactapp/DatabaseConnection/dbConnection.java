@@ -1,5 +1,6 @@
 package org.project.contactapp.DatabaseConnection;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,13 +23,21 @@ public class dbConnection {
                 + "phone_number VARCHAR(15) NULL, "
                 + "address VARCHAR(200) NULL, "
                 + "email_address VARCHAR(150) NULL, "
-                + "birth_date DATE NULL"
+                + "birth_date DATE NULL, "
+                + "image_path VARCHAR(255) NULL" // Add image_path column
                 + ");";
-
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public static void deleteDatabase() {
+        File dbFile = new File("contactdb.db");
+        if (dbFile.exists()) {
+            dbFile.delete();
         }
     }
 }
