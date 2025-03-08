@@ -10,8 +10,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.10.2</junit.version>
+        <java.version>17</java.version>
         <javafx.version>17.0.6</javafx.version>
+        <junit.version>5.10.2</junit.version>
+        <assertj.version>3.24.2</assertj.version>
+        <mockito.version>5.5.0</mockito.version>
+        <testfx.version>4.0.16-alpha</testfx.version>
     </properties>
 
     <dependencies>
@@ -62,11 +66,40 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- TestFX -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>${testfx.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- AssertJ -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.26.3</version>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Explicitly include Byte Buddy -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.15.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.15.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -79,8 +112,20 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Surefire Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <argLine>
+                        --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
 
@@ -100,12 +145,6 @@
                             <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
-                            <options>
-                                <option>--add-reads</option>
-                                <option>org.project.contactapp=junit.jupiter.api</option>
-                                <option>--add-reads</option>
-                                <option>org.project.contactapp=org.assertj.core</option>
-                            </options>
                         </configuration>
                     </execution>
                 </executions>

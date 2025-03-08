@@ -16,19 +16,19 @@ import java.util.stream.Collectors;
 public class AllContactsController {
 
     @FXML
-    private TableView<Person> contactTable;
+    TableView<Person> contactTable;
     @FXML
-    private TableColumn<Person, String> firstNameColumn;
+    TableColumn<Person, String> firstNameColumn;
     @FXML
-    private TableColumn<Person, String> lastNameColumn;
+    TableColumn<Person, String> lastNameColumn;
     @FXML
-    private TableColumn<Person, String> phoneNumberColumn;
+    TableColumn<Person, String> phoneNumberColumn;
     @FXML
-    private TextField searchField;
+    TextField searchField;
     @FXML
-    private Button deleteContactButton;
+    Button deleteContactButton;
 
-    private ObservableList<Person> allContacts;
+    ObservableList<Person> allContacts;
 
     @FXML
     public void initialize() {
@@ -53,7 +53,7 @@ public class AllContactsController {
     }
 
     @FXML
-    private void onDeleteContactClick() {
+    void onDeleteContactClick() {
         Person selectedContact = contactTable.getSelectionModel().getSelectedItem();
         if (selectedContact != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this contact?", ButtonType.YES, ButtonType.NO);
@@ -72,12 +72,12 @@ public class AllContactsController {
     }
 
     @FXML
-    private void onBackClick() {
+    void onBackClick() {
         MainApp.navigateTo("home-page.fxml");
     }
 
     @FXML
-    private void onAddContactClick() {
+    void onAddContactClick() {
         MainApp.navigateTo("addContact-page.fxml");
     }
 
@@ -98,7 +98,7 @@ public class AllContactsController {
         }
     }
 
-    private void handleRowDoubleClick(MouseEvent event) {
+    void handleRowDoubleClick(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Person selectedContact = contactTable.getSelectionModel().getSelectedItem();
             if (selectedContact != null) {

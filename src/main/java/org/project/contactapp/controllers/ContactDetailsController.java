@@ -1,103 +1,119 @@
 package org.project.contactapp.controllers;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import org.project.contactapp.MainApp;
-import org.project.contactapp.daos.PersonDAO;
-import org.project.contactapp.entities.Person;
+    import javafx.fxml.FXML;
+    import javafx.scene.control.DatePicker;
+    import javafx.scene.control.TextField;
+    import javafx.scene.control.TextFormatter;
+    import javafx.scene.image.Image;
+    import javafx.scene.image.ImageView;
+    import org.project.contactapp.MainApp;
+    import org.project.contactapp.daos.PersonDAO;
+    import org.project.contactapp.entities.Person;
 
-public class ContactDetailsController {
+    import java.util.regex.Pattern;
 
-    @FXML
-    private TextField lastNameField;
+    public class ContactDetailsController {
 
-    @FXML
-    private TextField firstNameField;
+        @FXML
+        TextField lastNameField;
 
-    @FXML
-    private TextField nicknameField;
+        @FXML
+        TextField firstNameField;
 
-    @FXML
-    private TextField phoneNumberField;
+        @FXML
+        TextField nicknameField;
 
-    @FXML
-    private TextField addressField;
+        @FXML
+        TextField phoneNumberField;
 
-    @FXML
-    private TextField emailAddressField;
+        @FXML
+        TextField addressField;
 
-    @FXML
-    private DatePicker birthDateField;
+        @FXML
+        TextField emailAddressField;
 
-    @FXML
-    private ImageView imageView;
+        @FXML
+        DatePicker birthDateField;
 
-    private Person selectedContact; // The contact being edited
+        @FXML
+        ImageView imageView;
 
-    @FXML
-    public void initialize() {
-        // Enable editing for all fields
-        setEditable(true);
-    }
+        Person selectedContact; // The contact being edited
 
-    public void setSelectedContact(Person contact) {
-        this.selectedContact = contact;
-
-        // Populate the fields with the contact's data
-        lastNameField.setText(selectedContact.getLastname());
-        firstNameField.setText(selectedContact.getFirstname());
-        nicknameField.setText(selectedContact.getNickname());
-        phoneNumberField.setText(selectedContact.getPhone_number());
-        addressField.setText(selectedContact.getAddress());
-        emailAddressField.setText(selectedContact.getEmail_address());
-        birthDateField.setValue(selectedContact.getBirth_date());
-
-        // Load the image if the path is not null or empty
-        if (selectedContact.getImage_path() != null && !selectedContact.getImage_path().isEmpty()) {
-            imageView.setImage(new Image("file:" + selectedContact.getImage_path()));
+        @FXML
+        public void initialize() {
+            // Enable editing for all fields
+            setEditable(true);
+            setPhoneNumberValidation();
         }
-    }
 
-    private void setEditable(boolean editable) {
-        lastNameField.setEditable(editable);
-        firstNameField.setEditable(editable);
-        nicknameField.setEditable(editable);
-        phoneNumberField.setEditable(editable);
-        addressField.setEditable(editable);
-        emailAddressField.setEditable(editable);
-        birthDateField.setDisable(!editable);
-    }
+        private void setPhoneNumberValidation() {
+            Pattern pattern = Pattern.compile("\\d*");
+            TextFormatter<String> formatter = new TextFormatter<>(change -> {
+                if (pattern.matcher(change.getControlNewText()).matches()) {
+                    return change;
+                } else {
+                    return null;
+                }
+            });
+            phoneNumberField.setTextFormatter(formatter);
+        }
 
-    @FXML
-    protected void onSaveClick() {
-        selectedContact.setLastname(lastNameField.getText());
-        selectedContact.setFirstname(firstNameField.getText());
-        selectedContact.setNickname(nicknameField.getText());
-        selectedContact.setPhone_number(phoneNumberField.getText());
-        selectedContact.setAddress(addressField.getText());
-        selectedContact.setEmail_address(emailAddressField.getText());
-        selectedContact.setBirth_date(birthDateField.getValue());
+        public void setSelectedContact(Person contact) {
+            this.selectedContact = contact;
 
-        boolean success = PersonDAO.updatePerson(selectedContact);
+            // Populate the fields with the contact's data
+            lastNameField.setText(selectedContact.getLastname());
+            firstNameField.setText(selectedContact.getFirstname());
+            nicknameField.setText(selectedContact.getNickname());
+            phoneNumberField.setText(selectedContact.getPhone_number());
+            addressField.setText(selectedContact.getAddress());
+            emailAddressField.setText(selectedContact.getEmail_address());
+            birthDateField.setValue(selectedContact.getBirth_date());
 
-        if (success) {
-            System.out.println("Contact updated successfully!");
+            // Load the image if the path is not null or empty
+            if (selectedContact.getImage_path() != null && !selectedContact.getImage_path().isEmpty()) {
+                imageView.setImage(new Image("file:" + selectedContact.getImage_path()));
+            }
+        }
+
+        private void setEditable(boolean editable) {
+            lastNameField.setEditable(editable);
+            firstNameField.setEditable(editable);
+            nicknameField.setEditable(editable);
+            phoneNumberField.setEditable(editable);
+            addressField.setEditable(editable);
+            emailAddressField.setEditable(editable);
+            birthDateField.setDisable(!editable);
+        }
+
+        @FXML
+        protected void onSaveClick() {
+            selectedContact.setLastname(lastNameField.getText());
+            selectedContact.setFirstname(firstNameField.getText());
+            selectedContact.setNickname(nicknameField.getText());
+            selectedContact.setPhone_number(phoneNumberField.getText());
+            selectedContact.setAddress(addressField.getText());
+            selectedContact.setEmail_address(emailAddressField.getText());
+            selectedContact.setBirth_date(birthDateField.getValue());
+
+            boolean success = PersonDAO.updatePerson(selectedContact);
+
+            if (success) {
+                System.out.println("Contact updated successfully!");
+                MainApp.navigateTo("allContacts-page.fxml");
+            } else {
+                System.out.println("Failed to update contact.");
+            }
+        }
+
+        @FXML
+        protected void onCancelClick() {
+            setSelectedContact(selectedContact);
+        }
+
+        @FXML
+        protected void onBackClick() {
             MainApp.navigateTo("allContacts-page.fxml");
-        } else {
-            System.out.println("Failed to update contact.");
         }
     }
-
-    @FXML
-    protected void onCancelClick() {
-        setSelectedContact(selectedContact);
-    }
-
-    @FXML
-    protected void onBackClick() {
-        MainApp.navigateTo("allContacts-page.fxml");
-    }
-}

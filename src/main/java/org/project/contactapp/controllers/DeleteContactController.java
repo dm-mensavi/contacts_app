@@ -9,7 +9,7 @@ import org.project.contactapp.entities.Person;
 
 public class DeleteContactController {
 
-    private Person selectedContact;
+    Person selectedContact;
 
     public void setSelectedContact(Person contact) {
         this.selectedContact = contact;
