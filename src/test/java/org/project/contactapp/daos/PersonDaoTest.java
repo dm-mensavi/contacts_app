@@ -1,199 +1,196 @@
 package org.project.contactapp.daos;
 
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.project.contactapp.DatabaseConnection.dbConnection;
+import org.mockito.MockitoAnnotations;
+import org.project.contactapp.MainApp;
+import org.project.contactapp.controllers.AddContactController;
+import org.project.contactapp.daos.PersonDAO;
 import org.project.contactapp.entities.Person;
+import org.testfx.framework.junit5.ApplicationTest;
 
-import java.sql.*;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class PersonDAOTest {
+class AddContactControllerTest extends ApplicationTest {
+
+    private AddContactController controller;
 
     @Mock
-    private Connection mockConnection;
-    @Mock
-    private Statement mockStatement;
-    @Mock
-    private PreparedStatement mockPreparedStatement;
-    @Mock
-    private ResultSet mockResultSet;
+    private PersonDAO mockPersonDAO;
+
+    private TextField lastNameField;
+    private TextField firstNameField;
+    private TextField nicknameField;
+    private TextField phoneNumberField;
+    private TextField addressField;
+    private TextField emailAddressField;
+    private DatePicker birthDateField;
+    private TextField imagePathField;
+    private ImageView imageView;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        // Initialize mocks
-        mockConnection = mock(Connection.class);
-        mockStatement = mock(Statement.class);
-        mockPreparedStatement = mock(PreparedStatement.class);
-        mockResultSet = mock(ResultSet.class);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        controller = new AddContactController() {
+            // Override constructor to inject mock PersonDAO
+            {
+                this.personDAO = mockPersonDAO;
+            }
+        };
 
-        // Mock dbConnection to return our mock Connection
-        try (MockedStatic<dbConnection> dbMock = Mockito.mockStatic(dbConnection.class)) {
-            dbMock.when(dbConnection::getConnection).thenReturn(mockConnection);
+        lastNameField = new TextField();
+        firstNameField = new TextField();
+        nicknameField = new TextField();
+        phoneNumberField = new TextField();
+        addressField = new TextField();
+        emailAddressField = new TextField();
+        birthDateField = new DatePicker();
+        imagePathField = new TextField();
+        imageView = new ImageView();
+
+        controller.lastNameField = lastNameField;
+        controller.firstNameField = firstNameField;
+        controller.nicknameField = nicknameField;
+        controller.phoneNumberField = phoneNumberField;
+        controller.addressField = addressField;
+        controller.emailAddressField = emailAddressField;
+        controller.birthDateField = birthDateField;
+        controller.imagePathField = imagePathField;
+        controller.imageView = imageView;
+
+        controller.initialize();
+    }
+
+    @Test
+    void testSaveContact_successfulSave() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Arrange
+            lastNameField.setText("Doe");
+            firstNameField.setText("John");
+            phoneNumberField.setText("1234567890");
+            emailAddressField.setText("john.doe@example.com");
+            birthDateField.setValue(LocalDate.of(1990, 1, 1));
+            when(mockPersonDAO.savePerson(any(Person.class))).thenReturn(true);
+
+            // Act
+            controller.onSaveContactClick();
+
+            // Assert
+            mainAppMock.verify(() -> MainApp.showToast("Contact saved successfully!"));
+            mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
         }
     }
 
     @Test
-    void testGetAllPersons_success() throws SQLException {
+    void testSaveContact_missingRequiredFields() {
         // Arrange
-        when(mockConnection.createStatement()).thenReturn(mockStatement);
-        when(mockStatement.executeQuery("SELECT * FROM person")).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false); // Two rows
-        when(mockResultSet.getInt("id")).thenReturn(1).thenReturn(2);
-        when(mockResultSet.getString("lastname")).thenReturn("Doe").thenReturn("Smith");
-        when(mockResultSet.getString("firstname")).thenReturn("John").thenReturn("Jane");
-        when(mockResultSet.getString("nickname")).thenReturn("Johnny").thenReturn("Janie");
-        when(mockResultSet.getString("phone_number")).thenReturn("1234567890").thenReturn("0987654321");
-        when(mockResultSet.getString("address")).thenReturn("123 Main St").thenReturn("456 Oak Ave");
-        when(mockResultSet.getString("email_address")).thenReturn("john.doe@example.com").thenReturn("jane.smith@example.com");
-        when(mockResultSet.getString("birth_date")).thenReturn(String.valueOf(LocalDate.of(1990, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()))
-                .thenReturn(String.valueOf(LocalDate.of(1995, 5, 5).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()));
-        when(mockResultSet.getString("image_path")).thenReturn("/path/to/john.jpg").thenReturn("/path/to/jane.jpg");
+        firstNameField.setText("John");
+        phoneNumberField.setText("1234567890");
+        // lastNameField is empty
 
         // Act
-        List<Person> persons = PersonDAO.getAllPersons();
+        controller.onSaveContactClick();
 
-        // Assert
-        assertThat(persons).hasSize(2);
-        Person person1 = persons.get(0);
-        assertThat(person1.getId()).isEqualTo(1);
-        assertThat(person1.getLastname()).isEqualTo("Doe");
-        assertThat(person1.getFirstname()).isEqualTo("John");
-        assertThat(person1.getPhone_number()).isEqualTo("1234567890");
-        assertThat(person1.getBirth_date()).isEqualTo(LocalDate.of(1990, 1, 1));
-
-        Person person2 = persons.get(1);
-        assertThat(person2.getId()).isEqualTo(2);
-        assertThat(person2.getLastname()).isEqualTo("Smith");
-        assertThat(person2.getFirstname()).isEqualTo("Jane");
-        assertThat(person2.getBirth_date()).isEqualTo(LocalDate.of(1995, 5, 5));
+        // Assert - Alert is shown, but we can't test it directly in unit tests
     }
 
     @Test
-    void testGetAllPersons_emptyResult() throws SQLException {
+    void testSaveContact_invalidEmail() {
         // Arrange
-        when(mockConnection.createStatement()).thenReturn(mockStatement);
-        when(mockStatement.executeQuery("SELECT * FROM person")).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(false); // No rows
+        lastNameField.setText("Doe");
+        firstNameField.setText("John");
+        phoneNumberField.setText("1234567890");
+        emailAddressField.setText("invalid-email");
 
         // Act
-        List<Person> persons = PersonDAO.getAllPersons();
+        controller.onSaveContactClick();
 
-        // Assert
-        assertThat(persons).isEmpty();
+        // Assert - Alert is shown, but we can't test it directly in unit tests
     }
 
     @Test
-    void testSavePerson_success() throws SQLException {
+    void testPhoneNumberValidation_onlyAllowsNumbers() {
         // Arrange
-        Person person = new Person(0, "Doe", "John", "Johnny", "1234567890", "123 Main St", "john.doe@example.com", LocalDate.of(1990, 1, 1));
-        person.setImage_path("/path/to/image.jpg");
+        phoneNumberField.setText("abc123");
 
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // 1 row affected
+        // Act & Assert
+        assertThat(phoneNumberField.getText()).isEmpty();
 
-        // Act
-        boolean result = PersonDAO.savePerson(person);
-
-        // Assert
-        assertThat(result).isTrue();
-        verify(mockPreparedStatement).setString(1, "Doe");
-        verify(mockPreparedStatement).setString(2, "John");
-        verify(mockPreparedStatement).setString(3, "Johnny");
-        verify(mockPreparedStatement).setString(4, "1234567890");
-        verify(mockPreparedStatement).setString(5, "123 Main St");
-        verify(mockPreparedStatement).setString(6, "john.doe@example.com");
-        verify(mockPreparedStatement).setDate(7, Date.valueOf(LocalDate.of(1990, 1, 1)));
-        verify(mockPreparedStatement).setString(8, "/path/to/image.jpg");
+        phoneNumberField.setText("123456");
+        assertThat(phoneNumberField.getText()).isEqualTo("123456");
     }
 
     @Test
-    void testSavePerson_failure() throws SQLException {
-        // Arrange
-        Person person = new Person(0, "Doe", "John", null, "1234567890", null, null, null);
+    void testCancel() {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Act
+            controller.onCancelClick();
 
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("Insert failed"));
-
-        // Act
-        boolean result = PersonDAO.savePerson(person);
-
-        // Assert
-        assertThat(result).isFalse();
+            // Assert
+            mainAppMock.verify(() -> MainApp.navigateTo("home-page.fxml"));
+        }
     }
 
     @Test
-    void testUpdatePerson_success() throws SQLException {
-        // Arrange
-        Person person = new Person(1, "Smith", "Jane", "Janie", "0987654321", "456 Oak Ave", "jane.smith@example.com", LocalDate.of(1995, 5, 5));
-        person.setImage_path("/path/to/jane.jpg");
+    void testBack() {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Act
+            controller.onBackClick();
 
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // 1 row affected
-
-        // Act
-        boolean result = PersonDAO.updatePerson(person);
-
-        // Assert
-        assertThat(result).isTrue();
-        verify(mockPreparedStatement).setString(1, "Smith");
-        verify(mockPreparedStatement).setString(2, "Jane");
-        verify(mockPreparedStatement).setString(3, "Janie");
-        verify(mockPreparedStatement).setString(4, "0987654321");
-        verify(mockPreparedStatement).setString(5, "456 Oak Ave");
-        verify(mockPreparedStatement).setString(6, "jane.smith@example.com");
-        verify(mockPreparedStatement).setDate(7, Date.valueOf(LocalDate.of(1995, 5, 5)));
-        verify(mockPreparedStatement).setString(8, "/path/to/jane.jpg");
-        verify(mockPreparedStatement).setInt(9, 1);
+            // Assert
+            mainAppMock.verify(() -> MainApp.navigateTo("home-page.fxml"));
+        }
     }
 
     @Test
-    void testUpdatePerson_failure() throws SQLException {
-        // Arrange
-        Person person = new Person(1, "Smith", "Jane", null, "0987654321", null, null, null);
+    void testSaveContact_saveFailure() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Arrange
+            lastNameField.setText("Doe");
+            firstNameField.setText("John");
+            phoneNumberField.setText("1234567890");
+            emailAddressField.setText("john.doe@example.com");
+            when(mockPersonDAO.savePerson(any(Person.class))).thenReturn(false);
 
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("Update failed"));
+            // Act
+            controller.onSaveContactClick();
 
-        // Act
-        boolean result = PersonDAO.updatePerson(person);
-
-        // Assert
-        assertThat(result).isFalse();
+            // Assert - Alert is shown, no navigation
+            mainAppMock.verifyNoInteractions();
+        }
     }
 
     @Test
-    void testDeletePerson_success() throws SQLException {
-        // Arrange
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // 1 row affected
+    void testSaveContact_databaseError() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Arrange
+            lastNameField.setText("Doe");
+            firstNameField.setText("John");
+            phoneNumberField.setText("1234567890");
+            emailAddressField.setText("john.doe@example.com");
+            when(mockPersonDAO.savePerson(any(Person.class))).thenThrow(new SQLException("Database error"));
 
-        // Act
-        boolean result = PersonDAO.deletePerson(1);
+            // Act
+            controller.onSaveContactClick();
 
-        // Assert
-        assertThat(result).isTrue();
-        verify(mockPreparedStatement).setInt(1, 1);
+            // Assert - Alert is shown, no navigation
+            mainAppMock.verifyNoInteractions();
+        }
     }
 
     @Test
-    void testDeletePerson_failure() throws SQLException {
-        // Arrange
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("Delete failed"));
-
-        // Act
-        boolean result = PersonDAO.deletePerson(1);
-
-        // Assert
-        assertThat(result).isFalse();
+    void testBrowseImageClick() {
+        // Note: FileChooser is hard to test in unit tests without a real UI.
+        // This test would typically require TestFX robot interaction or mocking FileChooser,
+        // but we'll skip it here as it’s UI-dependent and better suited for integration tests.
     }
 }

@@ -5,13 +5,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.project.contactapp.MainApp;
 import org.project.contactapp.daos.PersonDAO;
 import org.project.contactapp.entities.Person;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +23,9 @@ import static org.mockito.Mockito.*;
 class ContactDetailsControllerTest extends ApplicationTest {
 
     private ContactDetailsController controller;
+    @Mock
+    private PersonDAO mockPersonDAO;
+
     private TextField lastNameField;
     private TextField firstNameField;
     private TextField nicknameField;
@@ -31,7 +37,14 @@ class ContactDetailsControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() {
-        controller = new ContactDetailsController();
+        MockitoAnnotations.openMocks(this);
+        controller = new ContactDetailsController() {
+            // Override constructor to inject mock PersonDAO
+            {
+                this.personDAO = mockPersonDAO;
+            }
+        };
+
         lastNameField = new TextField();
         firstNameField = new TextField();
         nicknameField = new TextField();
@@ -63,13 +76,13 @@ class ContactDetailsControllerTest extends ApplicationTest {
         assertThat(addressField.isEditable()).isTrue();
         assertThat(emailAddressField.isEditable()).isTrue();
         assertThat(birthDateField.isDisable()).isFalse();
-        // Phone number validation is set, but we’ll test it separately
     }
 
     @Test
     void testSetSelectedContact() {
         // Arrange
         Person person = new Person();
+        person.setId(1);
         person.setLastname("Doe");
         person.setFirstname("John");
         person.setNickname("Johnny");
@@ -106,19 +119,18 @@ class ContactDetailsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void testOnSaveClick_success() {
-        try (MockedStatic<PersonDAO> personDAOMock = Mockito.mockStatic(PersonDAO.class);
-             MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+    void testOnSaveClick_success() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
             // Arrange
             Person person = new Person();
-            person.setId(1); // Assuming Person has an ID field
+            person.setId(1);
             controller.setSelectedContact(person);
             lastNameField.setText("Smith");
             firstNameField.setText("Jane");
             phoneNumberField.setText("0987654321");
             emailAddressField.setText("jane.smith@example.com");
             birthDateField.setValue(LocalDate.of(1995, 5, 5));
-            personDAOMock.when(() -> PersonDAO.updatePerson(any(Person.class))).thenReturn(true);
+            when(mockPersonDAO.updatePerson(any(Person.class))).thenReturn(true);
 
             // Act
             controller.onSaveClick();
@@ -134,15 +146,14 @@ class ContactDetailsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void testOnSaveClick_failure() {
-        try (MockedStatic<PersonDAO> personDAOMock = Mockito.mockStatic(PersonDAO.class);
-             MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+    void testOnSaveClick_failure() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
             // Arrange
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
             lastNameField.setText("Smith");
-            personDAOMock.when(() -> PersonDAO.updatePerson(any(Person.class))).thenReturn(false);
+            when(mockPersonDAO.updatePerson(any(Person.class))).thenReturn(false);
 
             // Act
             controller.onSaveClick();
@@ -150,6 +161,25 @@ class ContactDetailsControllerTest extends ApplicationTest {
             // Assert
             assertThat(person.getLastname()).isEqualTo("Smith");
             mainAppMock.verifyNoInteractions(); // Navigation should not occur on failure
+        }
+    }
+
+    @Test
+    void testOnSaveClick_databaseError() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Arrange
+            Person person = new Person();
+            person.setId(1);
+            controller.setSelectedContact(person);
+            lastNameField.setText("Smith");
+            when(mockPersonDAO.updatePerson(any(Person.class))).thenThrow(new SQLException("Update error"));
+
+            // Act
+            controller.onSaveClick();
+
+            // Assert
+            assertThat(person.getLastname()).isEqualTo("Smith");
+            mainAppMock.verifyNoInteractions(); // Navigation should not occur on error
         }
     }
 

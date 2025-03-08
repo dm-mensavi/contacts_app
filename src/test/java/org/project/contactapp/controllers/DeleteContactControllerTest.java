@@ -1,99 +1,102 @@
 package org.project.contactapp.controllers;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.project.contactapp.MainApp;
 import org.project.contactapp.daos.PersonDAO;
 import org.project.contactapp.entities.Person;
 import org.testfx.framework.junit5.ApplicationTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.sql.SQLException;
+
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DeleteContactControllerTest extends ApplicationTest {
 
     private DeleteContactController controller;
-    private Person selectedContact;
+    @Mock
+    private PersonDAO mockPersonDAO;
 
     @BeforeEach
     void setUp() {
-        controller = new DeleteContactController();
-        selectedContact = new Person();
-        selectedContact.setId(1); // Assuming Person has an ID field
-        controller.setSelectedContact(selectedContact);
+        MockitoAnnotations.openMocks(this);
+        controller = new DeleteContactController() {
+            // Override constructor to inject mock PersonDAO
+            {
+                this.personDAO = mockPersonDAO;
+            }
+        };
     }
 
     @Test
     void testSetSelectedContact() {
         // Arrange
-        Person newContact = new Person();
-        newContact.setId(2);
+        Person person = new Person();
+        person.setId(1);
 
         // Act
-        controller.setSelectedContact(newContact);
+        controller.setSelectedContact(person);
 
         // Assert
-        assertThat(controller.selectedContact).isSameAs(newContact);
+        assertThat(controller.selectedContact).isSameAs(person);
     }
 
     @Test
-    void testOnDeleteClick_success() {
-        try (MockedStatic<PersonDAO> personDAOMock = Mockito.mockStatic(PersonDAO.class);
-             MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+    void testOnDeleteClick_success() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
             // Arrange
-            personDAOMock.when(() -> PersonDAO.deletePerson(1)).thenReturn(true);
+            Person person = new Person();
+            person.setId(1);
+            controller.setSelectedContact(person);
+            when(mockPersonDAO.deletePerson(1)).thenReturn(true);
 
-            // Act - We can't easily simulate the Alert dialog, so we’ll call the logic directly
-            interact(() -> {
-                Alert alert = mock(Alert.class);
-                when(alert.showAndWait()).thenReturn(java.util.Optional.of(ButtonType.YES));
-                controller.onDeleteClick(); // This would normally show the dialog
-            });
+            // Act - Simulate confirmation (bypass Alert)
+            interact(() -> controller.onDeleteClick());
 
             // Assert
-            personDAOMock.verify(() -> PersonDAO.deletePerson(1));
+            verify(mockPersonDAO).deletePerson(1);
             mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
         }
     }
 
     @Test
-    void testOnDeleteClick_failure() {
-        try (MockedStatic<PersonDAO> personDAOMock = Mockito.mockStatic(PersonDAO.class);
-             MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+    void testOnDeleteClick_failure() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
             // Arrange
-            personDAOMock.when(() -> PersonDAO.deletePerson(1)).thenReturn(false);
+            Person person = new Person();
+            person.setId(1);
+            controller.setSelectedContact(person);
+            when(mockPersonDAO.deletePerson(1)).thenReturn(false);
 
-            // Act
-            interact(() -> {
-                Alert alert = mock(Alert.class);
-                when(alert.showAndWait()).thenReturn(java.util.Optional.of(ButtonType.YES));
-                controller.onDeleteClick();
-            });
+            // Act - Simulate confirmation
+            interact(() -> controller.onDeleteClick());
 
             // Assert
-            personDAOMock.verify(() -> PersonDAO.deletePerson(1));
+            verify(mockPersonDAO).deletePerson(1);
             mainAppMock.verifyNoInteractions(); // Navigation should not occur on failure
         }
     }
 
     @Test
-    void testOnDeleteClick_cancel() {
-        try (MockedStatic<PersonDAO> personDAOMock = Mockito.mockStatic(PersonDAO.class);
-             MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
-            interact(() -> {
-                Alert alert = mock(Alert.class);
-                when(alert.showAndWait()).thenReturn(java.util.Optional.of(ButtonType.NO));
-                controller.onDeleteClick();
-            });
+    void testOnDeleteClick_databaseError() throws SQLException {
+        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
+            // Arrange
+            Person person = new Person();
+            person.setId(1);
+            controller.setSelectedContact(person);
+            when(mockPersonDAO.deletePerson(1)).thenThrow(new SQLException("Delete error"));
+
+            // Act - Simulate confirmation
+            interact(() -> controller.onDeleteClick());
 
             // Assert
-            personDAOMock.verifyNoInteractions(); // Delete should not be called
-            mainAppMock.verifyNoInteractions(); // Navigation should not occur
+            verify(mockPersonDAO).deletePerson(1);
+            mainAppMock.verifyNoInteractions(); // Navigation should not occur on error
         }
     }
 

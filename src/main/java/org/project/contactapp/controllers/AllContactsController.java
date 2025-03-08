@@ -1,15 +1,19 @@
 package org.project.contactapp.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import org.project.contactapp.DatabaseConnection.dbConnection;
 import org.project.contactapp.MainApp;
 import org.project.contactapp.daos.PersonDAO;
 import org.project.contactapp.entities.Person;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +33,16 @@ public class AllContactsController {
     Button deleteContactButton;
 
     ObservableList<Person> allContacts;
+    PersonDAO personDAO;
+
+    public AllContactsController() {
+        try {
+            Connection connection = dbConnection.getConnection();
+            this.personDAO = new PersonDAO(connection);
+        } catch (SQLException e) {
+            Platform.runLater(() -> showAlert("Database Error", "Failed to initialize database connection: " + e.getMessage()));
+        }
+    }
 
     @FXML
     public void initialize() {
@@ -36,8 +50,19 @@ public class AllContactsController {
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastname"));
         phoneNumberColumn.setCellValueFactory(new PropertyValueFactory<>("phone_number"));
 
-        allContacts = FXCollections.observableArrayList(PersonDAO.getAllPersons());
-        contactTable.setItems(allContacts);
+        if (personDAO != null) {
+            try {
+                allContacts = FXCollections.observableArrayList(personDAO.getAllPersons());
+                contactTable.setItems(allContacts);
+            } catch (SQLException e) {
+                showAlert("Database Error", "Error loading contacts: " + e.getMessage());
+                allContacts = FXCollections.observableArrayList();
+                contactTable.setItems(allContacts);
+            }
+        } else {
+            allContacts = FXCollections.observableArrayList();
+            contactTable.setItems(allContacts);
+        }
 
         deleteContactButton.setDisable(true);
 
@@ -54,17 +79,26 @@ public class AllContactsController {
 
     @FXML
     void onDeleteContactClick() {
+        if (personDAO == null) {
+            showAlert("Error", "Database connection not available.");
+            return;
+        }
+
         Person selectedContact = contactTable.getSelectionModel().getSelectedItem();
         if (selectedContact != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this contact?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.YES) {
-                    boolean success = PersonDAO.deletePerson(selectedContact.getId());
-                    if (success) {
-                        allContacts.remove(selectedContact);
-                        System.out.println("Contact deleted successfully!");
-                    } else {
-                        System.out.println("Failed to delete contact.");
+                    try {
+                        boolean success = personDAO.deletePerson(selectedContact.getId());
+                        if (success) {
+                            allContacts.remove(selectedContact);
+                            System.out.println("Contact deleted successfully!");
+                        } else {
+                            showAlert("Error", "Failed to delete contact.");
+                        }
+                    } catch (SQLException e) {
+                        showAlert("Database Error", "Error deleting contact: " + e.getMessage());
                     }
                 }
             });
@@ -105,5 +139,15 @@ public class AllContactsController {
                 MainApp.navigateTo("contact-details.fxml", selectedContact);
             }
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }
