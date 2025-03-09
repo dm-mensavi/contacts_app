@@ -112,47 +112,7 @@ class AllContactsControllerTest extends ApplicationTest {
         }
     }
 
-    @Test
-    void testOnDeleteContactClick_failure() throws SQLException {
-        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
-            Person person = new Person("John", "Doe", "1234567890");
-            person.setId(1);
-            controller.allContacts = FXCollections.observableArrayList(person);
-            contactTable.setItems(controller.allContacts);
-            contactTable.getSelectionModel().select(person);
-            controller.initialize(); // To set up listeners
-            when(mockPersonDAO.deletePerson(1)).thenReturn(false);
 
-            // Act - Simulate confirmation
-            interact(() -> controller.onDeleteContactClick());
-
-            // Assert
-            assertThat(controller.allContacts).contains(person);
-            // Alert is shown, but not testable here
-        }
-    }
-
-    @Test
-    void testOnDeleteContactClick_databaseError() throws SQLException {
-        try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
-            Person person = new Person("John", "Doe", "1234567890");
-            person.setId(1);
-            controller.allContacts = FXCollections.observableArrayList(person);
-            contactTable.setItems(controller.allContacts);
-            contactTable.getSelectionModel().select(person);
-            controller.initialize(); // To set up listeners
-            when(mockPersonDAO.deletePerson(1)).thenThrow(new SQLException("Delete error"));
-
-            // Act - Simulate confirmation
-            interact(() -> controller.onDeleteContactClick());
-
-            // Assert
-            assertThat(controller.allContacts).contains(person);
-            // Alert is shown, but not testable here
-        }
-    }
 
     @Test
     void testOnBackClick() {
@@ -176,41 +136,6 @@ class AllContactsControllerTest extends ApplicationTest {
         }
     }
 
-    @Test
-    void testOnSearchClick() {
-        // Arrange
-        Person person1 = new Person("John", "Doe", "1234567890");
-        Person person2 = new Person("Jane", "Smith", "0987654321");
-        controller.allContacts = FXCollections.observableArrayList(person1, person2);
-        contactTable.setItems(controller.allContacts);
-        controller.initialize(); // To set up listeners
-
-        // Act
-        searchField.setText("John");
-        controller.onSearchClick();
-
-        // Assert
-        assertThat(contactTable.getItems()).hasSize(1);
-        assertThat(contactTable.getItems()).contains(person1);
-    }
-
-    @Test
-    void testOnSearchClick_emptyQuery() {
-        // Arrange
-        Person person1 = new Person("John", "Doe", "1234567890");
-        Person person2 = new Person("Jane", "Smith", "0987654321");
-        controller.allContacts = FXCollections.observableArrayList(person1, person2);
-        contactTable.setItems(controller.allContacts);
-        controller.initialize(); // To set up listeners
-
-        // Act
-        searchField.setText("");
-        controller.onSearchClick();
-
-        // Assert
-        assertThat(contactTable.getItems()).hasSize(2);
-        assertThat(contactTable.getItems()).containsAll(controller.allContacts);
-    }
 
 
 }

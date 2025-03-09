@@ -12,7 +12,7 @@ import org.project.contactapp.entities.Person;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class DeleteContactController {
+public abstract class DeleteContactController {
 
     Person selectedContact;
     PersonDAO personDAO;
@@ -70,4 +70,6 @@ public class DeleteContactController {
             alert.showAndWait();
         });
     }
+
+    protected abstract boolean confirmDelete();
 }
