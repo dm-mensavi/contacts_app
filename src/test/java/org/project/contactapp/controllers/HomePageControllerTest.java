@@ -19,6 +19,7 @@ class HomePageControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize the controller before each test
         controller = new HomePageController();
     }
 
@@ -30,10 +31,10 @@ class HomePageControllerTest extends ApplicationTest {
             PrintStream originalOut = System.out;
             System.setOut(new PrintStream(outContent));
 
-            // Act
+            // Act: Simulate the view contacts button click
             controller.onViewContactsClick();
 
-            // Assert
+            // Assert: Verify navigation to the all contacts page and correct console output
             mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
             assertThat(outContent.toString()).isEqualTo("View Contacts Clicked!" + System.lineSeparator());
 
@@ -50,10 +51,10 @@ class HomePageControllerTest extends ApplicationTest {
             PrintStream originalOut = System.out;
             System.setOut(new PrintStream(outContent));
 
-            // Act
+            // Act: Simulate the add contact button click
             controller.onAddContactClick();
 
-            // Assert
+            // Assert: Verify navigation to the add contact page and correct console output
             mainAppMock.verify(() -> MainApp.navigateTo("addContact-page.fxml"));
             assertThat(outContent.toString()).isEqualTo("Add Contact Clicked!" + System.lineSeparator());
 

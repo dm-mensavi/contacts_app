@@ -25,8 +25,10 @@ class DeleteContactControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize mocks
         MockitoAnnotations.openMocks(this);
 
+        // Create controller instance and inject mock PersonDAO
         controller = new DeleteContactController() {
             {
                 this.personDAO = mockPersonDAO;
@@ -41,35 +43,30 @@ class DeleteContactControllerTest extends ApplicationTest {
 
     @Test
     void testSetSelectedContact() {
-        // Arrange
+        // Arrange: Create a Person object with sample data
         Person person = new Person();
         person.setId(1);
 
-        // Act
+        // Act: Set the selected contact in the controller
         controller.setSelectedContact(person);
 
-        // Assert
+        // Assert: Verify that the selected contact is set correctly
         assertThat(controller.selectedContact).isSameAs(person);
     }
-
 
     @Test
     void testOnDeleteClick_failure() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-
-            // Arrange
+            // Arrange: Set up a Person object and mock delete failure
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
-
             when(mockPersonDAO.deletePerson(1)).thenReturn(false);
 
-            mainAppMock.when(() -> MainApp.navigateTo("allContacts-page.fxml")).thenAnswer(invocation -> null);
-
-            // Act
+            // Act: Simulate delete button click
             interact(() -> controller.onDeleteClick());
 
-            // Assert
+            // Assert: Verify that the delete operation was attempted and no navigation occurred
             verify(mockPersonDAO).deletePerson(1);
             mainAppMock.verifyNoInteractions();
         }
@@ -78,20 +75,16 @@ class DeleteContactControllerTest extends ApplicationTest {
     @Test
     void testOnDeleteClick_databaseError() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-
-            // Arrange
+            // Arrange: Set up a Person object and mock database error
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
-
             when(mockPersonDAO.deletePerson(1)).thenThrow(new SQLException("Delete error"));
 
-            mainAppMock.when(() -> MainApp.navigateTo("allContacts-page.fxml")).thenAnswer(invocation -> null);
-
-            // Act
+            // Act: Simulate delete button click
             interact(() -> controller.onDeleteClick());
 
-            // Assert
+            // Assert: Verify that the delete operation was attempted and no navigation occurred
             verify(mockPersonDAO).deletePerson(1);
             mainAppMock.verifyNoInteractions();
         }
@@ -100,13 +93,10 @@ class DeleteContactControllerTest extends ApplicationTest {
     @Test
     void testOnCancelClick() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-
-            mainAppMock.when(() -> MainApp.navigateTo("allContacts-page.fxml")).thenAnswer(invocation -> null);
-
-            // Act
+            // Act: Simulate cancel button click
             controller.onCancelClick();
 
-            // Assert
+            // Assert: Verify navigation to all contacts page
             mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
         }
     }

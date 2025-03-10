@@ -38,14 +38,17 @@ class AddContactControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize mocks
         MockitoAnnotations.openMocks(this);
+
+        // Create controller instance and inject mock PersonDAO
         controller = new AddContactController() {
-            // Override constructor to inject mock PersonDAO
             {
                 this.personDAO = mockPersonDAO;
             }
         };
 
+        // Initialize UI components
         lastNameField = new TextField();
         firstNameField = new TextField();
         nicknameField = new TextField();
@@ -56,6 +59,7 @@ class AddContactControllerTest extends ApplicationTest {
         imagePathField = new TextField();
         imageView = new ImageView();
 
+        // Set controller fields
         controller.lastNameField = lastNameField;
         controller.firstNameField = firstNameField;
         controller.nicknameField = nicknameField;
@@ -66,13 +70,14 @@ class AddContactControllerTest extends ApplicationTest {
         controller.imagePathField = imagePathField;
         controller.imageView = imageView;
 
+        // Initialize controller
         controller.initialize();
     }
 
     @Test
     void testSaveContact_successfulSave() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up valid contact details
             lastNameField.setText("Doe");
             firstNameField.setText("John");
             phoneNumberField.setText("1234567890");
@@ -80,10 +85,10 @@ class AddContactControllerTest extends ApplicationTest {
             birthDateField.setValue(LocalDate.of(1990, 1, 1));
             when(mockPersonDAO.savePerson(any(Person.class))).thenReturn(true);
 
-            // Act
+            // Act: Attempt to save contact
             controller.onSaveContactClick();
 
-            // Assert
+            // Assert: Verify success message and navigation
             mainAppMock.verify(() -> MainApp.showToast("Contact saved successfully!"));
             mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
         }
@@ -91,50 +96,52 @@ class AddContactControllerTest extends ApplicationTest {
 
     @Test
     void testSaveContact_missingRequiredFields() {
-        // Arrange
+        // Arrange: Set up contact details with missing last name
         firstNameField.setText("John");
         phoneNumberField.setText("1234567890");
-        // lastNameField is empty
 
-        // Act
+        // Act: Attempt to save contact
         controller.onSaveContactClick();
 
-        // Assert - Alert is shown, but we can't test it directly in unit tests
+        // Assert: Verify alert is shown (cannot be tested directly in unit tests)
     }
 
     @Test
     void testSaveContact_invalidEmail() {
-        // Arrange
+        // Arrange: Set up contact details with invalid email
         lastNameField.setText("Doe");
         firstNameField.setText("John");
         phoneNumberField.setText("1234567890");
         emailAddressField.setText("invalid-email");
 
-        // Act
+        // Act: Attempt to save contact
         controller.onSaveContactClick();
 
-        // Assert - Alert is shown, but we can't test it directly in unit tests
+        // Assert: Verify alert is shown (cannot be tested directly in unit tests)
     }
 
     @Test
     void testPhoneNumberValidation_onlyAllowsNumbers() {
-        // Arrange
+        // Arrange: Set up invalid phone number
         phoneNumberField.setText("abc123");
 
-        // Act & Assert
+        // Act & Assert: Verify phone number field is empty
         assertThat(phoneNumberField.getText()).isEmpty();
 
+        // Arrange: Set up valid phone number
         phoneNumberField.setText("123456");
+
+        // Act & Assert: Verify phone number field contains valid number
         assertThat(phoneNumberField.getText()).isEqualTo("123456");
     }
 
     @Test
     void testCancel() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
+            // Act: Attempt to cancel
             controller.onCancelClick();
 
-            // Assert
+            // Assert: Verify navigation to home page
             mainAppMock.verify(() -> MainApp.navigateTo("home-page.fxml"));
         }
     }
@@ -142,10 +149,10 @@ class AddContactControllerTest extends ApplicationTest {
     @Test
     void testBack() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
+            // Act: Attempt to go back
             controller.onBackClick();
 
-            // Assert
+            // Assert: Verify navigation to home page
             mainAppMock.verify(() -> MainApp.navigateTo("home-page.fxml"));
         }
     }
@@ -153,17 +160,17 @@ class AddContactControllerTest extends ApplicationTest {
     @Test
     void testSaveContact_saveFailure() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up valid contact details but simulate save failure
             lastNameField.setText("Doe");
             firstNameField.setText("John");
             phoneNumberField.setText("1234567890");
             emailAddressField.setText("john.doe@example.com");
             when(mockPersonDAO.savePerson(any(Person.class))).thenReturn(false);
 
-            // Act
+            // Act: Attempt to save contact
             controller.onSaveContactClick();
 
-            // Assert - Alert is shown, no navigation
+            // Assert: Verify no interactions with MainApp (alert shown)
             mainAppMock.verifyNoInteractions();
         }
     }
@@ -171,17 +178,17 @@ class AddContactControllerTest extends ApplicationTest {
     @Test
     void testSaveContact_databaseError() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up valid contact details but simulate database error
             lastNameField.setText("Doe");
             firstNameField.setText("John");
             phoneNumberField.setText("1234567890");
             emailAddressField.setText("john.doe@example.com");
             when(mockPersonDAO.savePerson(any(Person.class))).thenThrow(new SQLException("Database error"));
 
-            // Act
+            // Act: Attempt to save contact
             controller.onSaveContactClick();
 
-            // Assert - Alert is shown, no navigation
+            // Assert: Verify no interactions with MainApp (alert shown)
             mainAppMock.verifyNoInteractions();
         }
     }
