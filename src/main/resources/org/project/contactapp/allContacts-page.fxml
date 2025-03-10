@@ -32,24 +32,24 @@
       </HBox>
 
       <!-- Contact Table -->
-      <TableView fx:id="contactTable" prefHeight="300.0" prefWidth="250.0">
+      <TableView fx:id="contactTable" prefHeight="450.0" prefWidth="250.0">
         <columns>
           <!-- First Name Column -->
-          <TableColumn fx:id="firstNameColumn" text="First Name" prefWidth="80.0">
+          <TableColumn fx:id="firstNameColumn" text="First Name" prefWidth="110.0">
             <cellValueFactory>
               <PropertyValueFactory property="firstname"/>
             </cellValueFactory>
           </TableColumn>
 
           <!-- Last Name Column -->
-          <TableColumn fx:id="lastNameColumn" text="Last Name" prefWidth="80.0">
+          <TableColumn fx:id="lastNameColumn" text="Last Name" prefWidth="110.0">
             <cellValueFactory>
               <PropertyValueFactory property="lastname"/>
             </cellValueFactory>
           </TableColumn>
 
           <!-- Phone Number Column -->
-          <TableColumn fx:id="phoneNumberColumn" text="Phone Number" prefWidth="80.0">
+          <TableColumn fx:id="phoneNumberColumn" text="Phone Number" prefWidth="140.0">
             <cellValueFactory>
               <PropertyValueFactory property="phone_number"/>
             </cellValueFactory>
