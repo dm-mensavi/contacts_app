@@ -37,14 +37,17 @@ class ContactDetailsControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize mocks
         MockitoAnnotations.openMocks(this);
+
+        // Create controller instance and inject mock PersonDAO
         controller = new ContactDetailsController() {
-            // Override constructor to inject mock PersonDAO
             {
                 this.personDAO = mockPersonDAO;
             }
         };
 
+        // Initialize UI components
         lastNameField = new TextField();
         firstNameField = new TextField();
         nicknameField = new TextField();
@@ -54,6 +57,7 @@ class ContactDetailsControllerTest extends ApplicationTest {
         birthDateField = new DatePicker();
         imageView = new ImageView();
 
+        // Set controller fields
         controller.lastNameField = lastNameField;
         controller.firstNameField = firstNameField;
         controller.nicknameField = nicknameField;
@@ -63,12 +67,13 @@ class ContactDetailsControllerTest extends ApplicationTest {
         controller.birthDateField = birthDateField;
         controller.imageView = imageView;
 
+        // Initialize controller
         controller.initialize();
     }
 
     @Test
     void testInitialize() {
-        // Assert
+        // Assert that all text fields are editable and date picker is enabled
         assertThat(lastNameField.isEditable()).isTrue();
         assertThat(firstNameField.isEditable()).isTrue();
         assertThat(nicknameField.isEditable()).isTrue();
@@ -80,7 +85,7 @@ class ContactDetailsControllerTest extends ApplicationTest {
 
     @Test
     void testSetSelectedContact() {
-        // Arrange
+        // Arrange: Create a Person object with sample data
         Person person = new Person();
         person.setId(1);
         person.setLastname("Doe");
@@ -92,10 +97,10 @@ class ContactDetailsControllerTest extends ApplicationTest {
         person.setBirth_date(LocalDate.of(1990, 1, 1));
         person.setImage_path("/path/to/image.jpg");
 
-        // Act
+        // Act: Set the selected contact in the controller
         controller.setSelectedContact(person);
 
-        // Assert
+        // Assert: Verify that the UI fields are populated with the person's data
         assertThat(lastNameField.getText()).isEqualTo("Doe");
         assertThat(firstNameField.getText()).isEqualTo("John");
         assertThat(nicknameField.getText()).isEqualTo("Johnny");
@@ -110,10 +115,11 @@ class ContactDetailsControllerTest extends ApplicationTest {
 
     @Test
     void testPhoneNumberValidation_onlyAllowsNumbers() {
-        // Act & Assert
+        // Act & Assert: Verify that non-numeric input is cleared
         phoneNumberField.setText("abc123");
         assertThat(phoneNumberField.getText()).isEmpty();
 
+        // Act & Assert: Verify that numeric input is accepted
         phoneNumberField.setText("123456");
         assertThat(phoneNumberField.getText()).isEqualTo("123456");
     }
@@ -121,7 +127,7 @@ class ContactDetailsControllerTest extends ApplicationTest {
     @Test
     void testOnSaveClick_success() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up a Person object and mock successful update
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
@@ -132,10 +138,10 @@ class ContactDetailsControllerTest extends ApplicationTest {
             birthDateField.setValue(LocalDate.of(1995, 5, 5));
             when(mockPersonDAO.updatePerson(any(Person.class))).thenReturn(true);
 
-            // Act
+            // Act: Simulate save button click
             controller.onSaveClick();
 
-            // Assert
+            // Assert: Verify that the person's data is updated and navigation occurs
             assertThat(person.getLastname()).isEqualTo("Smith");
             assertThat(person.getFirstname()).isEqualTo("Jane");
             assertThat(person.getPhone_number()).isEqualTo("0987654321");
@@ -148,59 +154,57 @@ class ContactDetailsControllerTest extends ApplicationTest {
     @Test
     void testOnSaveClick_failure() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up a Person object and mock update failure
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
             lastNameField.setText("Smith");
             when(mockPersonDAO.updatePerson(any(Person.class))).thenReturn(false);
 
-            // Act
+            // Act: Simulate save button click
             controller.onSaveClick();
 
-            // Assert
+            // Assert: Verify that the person's data is not updated and no navigation occurs
             assertThat(person.getLastname()).isEqualTo("Smith");
-            mainAppMock.verifyNoInteractions(); // Navigation should not occur on failure
+            mainAppMock.verifyNoInteractions();
         }
     }
 
     @Test
     void testOnSaveClick_databaseError() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up a Person object and mock database error
             Person person = new Person();
             person.setId(1);
             controller.setSelectedContact(person);
             lastNameField.setText("Smith");
             when(mockPersonDAO.updatePerson(any(Person.class))).thenThrow(new SQLException("Update error"));
 
-            // Act
+            // Act: Simulate save button click
             controller.onSaveClick();
 
-            // Assert
+            // Assert: Verify that the person's data is not updated and no navigation occurs
             assertThat(person.getLastname()).isEqualTo("Smith");
-            mainAppMock.verifyNoInteractions(); // Navigation should not occur on error
+            mainAppMock.verifyNoInteractions();
         }
     }
 
     @Test
     void testOnCancelClick() {
-        // Arrange
+        // Arrange: Set up a Person object and modify UI fields
         Person person = new Person();
         person.setLastname("Doe");
         person.setFirstname("John");
         person.setPhone_number("1234567890");
         controller.setSelectedContact(person);
-
-        // Modify fields
         lastNameField.setText("Smith");
         firstNameField.setText("Jane");
         phoneNumberField.setText("0987654321");
 
-        // Act
+        // Act: Simulate cancel button click
         controller.onCancelClick();
 
-        // Assert
+        // Assert: Verify that the UI fields are reset to the original person's data
         assertThat(lastNameField.getText()).isEqualTo("Doe");
         assertThat(firstNameField.getText()).isEqualTo("John");
         assertThat(phoneNumberField.getText()).isEqualTo("1234567890");
@@ -209,10 +213,10 @@ class ContactDetailsControllerTest extends ApplicationTest {
     @Test
     void testOnBackClick() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
+            // Act: Simulate back button click
             controller.onBackClick();
 
-            // Assert
+            // Assert: Verify navigation to all contacts page
             mainAppMock.verify(() -> MainApp.navigateTo("allContacts-page.fxml"));
         }
     }

@@ -36,14 +36,17 @@ class AllContactsControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
+        // Initialize mocks
         MockitoAnnotations.openMocks(this);
+
+        // Create controller instance and inject mock PersonDAO
         controller = new AllContactsController() {
-            // Override constructor to inject mock PersonDAO
             {
                 this.personDAO = mockPersonDAO;
             }
         };
 
+        // Initialize UI components
         contactTable = new TableView<>();
         firstNameColumn = new TableColumn<>("First Name");
         lastNameColumn = new TableColumn<>("Last Name");
@@ -51,6 +54,7 @@ class AllContactsControllerTest extends ApplicationTest {
         searchField = new TextField();
         deleteContactButton = new Button();
 
+        // Set controller fields
         controller.contactTable = contactTable;
         controller.firstNameColumn = firstNameColumn;
         controller.lastNameColumn = lastNameColumn;
@@ -58,22 +62,23 @@ class AllContactsControllerTest extends ApplicationTest {
         controller.searchField = searchField;
         controller.deleteContactButton = deleteContactButton;
 
+        // Initialize controller
         controller.initialize();
     }
 
     @Test
     void testInitialize_success() throws SQLException {
-        // Arrange
+        // Arrange: Set up mock data
         List<Person> mockPersons = Arrays.asList(
                 new Person("John", "Doe", "1234567890"),
                 new Person("Jane", "Smith", "0987654321")
         );
         when(mockPersonDAO.getAllPersons()).thenReturn(mockPersons);
 
-        // Act
+        // Act: Initialize controller
         controller.initialize();
 
-        // Assert
+        // Assert: Verify table is populated and delete button is disabled
         assertThat(contactTable.getItems()).hasSize(2);
         assertThat(contactTable.getItems()).containsAll(mockPersons);
         assertThat(deleteContactButton.isDisabled()).isTrue();
@@ -81,13 +86,13 @@ class AllContactsControllerTest extends ApplicationTest {
 
     @Test
     void testInitialize_databaseError() throws SQLException {
-        // Arrange
+        // Arrange: Simulate database error
         when(mockPersonDAO.getAllPersons()).thenThrow(new SQLException("Database error"));
 
-        // Act
+        // Act: Initialize controller
         controller.initialize();
 
-        // Assert
+        // Assert: Verify table is empty
         assertThat(contactTable.getItems()).isEmpty();
         // Alert is shown, but not testable here
     }
@@ -95,7 +100,7 @@ class AllContactsControllerTest extends ApplicationTest {
     @Test
     void testOnDeleteContactClick_success() throws SQLException {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Arrange
+            // Arrange: Set up selected contact and mock delete operation
             Person person = new Person("John", "Doe", "1234567890");
             person.setId(1);
             controller.allContacts = FXCollections.observableArrayList(person);
@@ -104,23 +109,21 @@ class AllContactsControllerTest extends ApplicationTest {
             controller.initialize(); // To set up listeners
             when(mockPersonDAO.deletePerson(1)).thenReturn(true);
 
-            // Act - Simulate confirmation (bypass Alert)
+            // Act: Simulate delete contact click
             interact(() -> controller.onDeleteContactClick());
 
-            // Assert
+            // Assert: Verify contact is removed from list
             assertThat(controller.allContacts).isEmpty();
         }
     }
 
-
-
     @Test
     void testOnBackClick() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
+            // Act: Simulate back button click
             controller.onBackClick();
 
-            // Assert
+            // Assert: Verify navigation to home page
             mainAppMock.verify(() -> MainApp.navigateTo("home-page.fxml"));
         }
     }
@@ -128,14 +131,11 @@ class AllContactsControllerTest extends ApplicationTest {
     @Test
     void testOnAddContactClick() {
         try (MockedStatic<MainApp> mainAppMock = Mockito.mockStatic(MainApp.class)) {
-            // Act
+            // Act: Simulate add contact button click
             controller.onAddContactClick();
 
-            // Assert
+            // Assert: Verify navigation to add contact page
             mainAppMock.verify(() -> MainApp.navigateTo("addContact-page.fxml"));
         }
     }
-
-
-
 }
