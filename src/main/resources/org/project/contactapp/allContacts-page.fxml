@@ -30,7 +30,6 @@
         <TextField fx:id="searchField" promptText="Search contacts..." prefWidth="290.0"/>
         <Button text="Search" onAction="#onSearchClick"/>
     </HBox>
-
     <!-- Contact Table -->
     <TableView fx:id="contactTable" prefHeight="450.0" prefWidth="250.0">
         <columns>
