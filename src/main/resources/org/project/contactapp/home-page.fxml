@@ -1,29 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-      <?import javafx.geometry.Insets?>
-      <?import javafx.scene.control.Button?>
-      <?import javafx.scene.control.Label?>
-      <?import javafx.scene.layout.StackPane?>
-      <?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-      <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.project.contactapp.controllers.HomePageController" alignment="CENTER">
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="org.project.contactapp.controllers.HomePageController">
           <!-- Main content -->
           <VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: #f4f4f4;">
               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="50.0"/>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="50.0" />
               </padding>
+              <ImageView fx:id="imageView" fitWidth="200" fitHeight="200">
+                  <image>
+                      <Image url="@images/background.png" />
+                  </image>
+              </ImageView>
 
               <!-- Title -->
-              <Label text="My Contacts" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+              <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" text="My Contacts" />
 
               <!-- Subtitle -->
-              <Label text="Keep all your contacts organized" style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+              <Label style="-fx-font-size: 14px; -fx-text-fill: #666;" text="Keep all your contacts organized" />
 
               <!-- Action Buttons -->
-              <Button text="View Contacts" onAction="#onViewContactsClick"
-                      style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 14px;"/>
-              <Button text="Add Contact" onAction="#onAddContactClick"
-                      style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px;"/>
+              <Button onAction="#onViewContactsClick" style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 14px;" text="View Contacts" />
+              <Button onAction="#onAddContactClick" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px;" text="Add Contact" />
           </VBox>
 
           <!-- Toaster placeholder -->
