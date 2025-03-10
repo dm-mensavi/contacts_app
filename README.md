@@ -1,5 +1,3 @@
-
-
 ---
 
 # ContactApp 📇
@@ -17,6 +15,7 @@ Welcome to **ContactApp**, a JavaFX-based contact management application built w
 - [Running the Application](#running-the-application-🏃‍♂️)
 - [Testing](#testing-🧪)
 - [Usage](#usage-📋)
+- [Screenshots](#screenshots-📸)
 - [Contributing](#contributing-🤝)
 - [License](#license-📜)
 
@@ -62,25 +61,22 @@ contactapp/
 │   │   │       │   ├── DeleteContactController.java
 │   │   │       │   └── HomePageController.java
 │   │   │       ├── daos/             # Data Access Objects
-│   │   │       │   └── PersonDAO.java
 │   │   │       ├── entities/         # Data models
-│   │   │       │   └── Person.java
+│   │   │       ├── utils/            # Utility classes
 │   │   │       ├── DatabaseConnection/  # DB connection utility
-│   │   │       │   └── dbConnection.java
 │   │   │       └── MainApp.java      # Application entry point
 │   │   └── resources/
-│   │       └── *.fxml                # FXML files for UI layouts
+│   │       └── org/project/contactapp/
+│   │           ├── images/           # App images and screenshots
+│   │           │   ├── add_contact.png
+│   │           │   ├── allcontacts.png
+│   │           │   ├── contact_details.png
+│   │           │   └── home.png
+│   │           └── *.fxml            # FXML files for UI layouts
 │   └── test/
 │       └── java/
 │           └── org/project/contactapp/
 │               └── controllers/      # Unit tests for controllers
-│                   ├── AddContactControllerTest.java
-│                   ├── AllContactsControllerTest.java
-│                   ├── ContactDetailsControllerTest.java
-│                   ├── DeleteContactControllerTest.java
-│                   └── HomePageControllerTest.java
-│               └── daos/             # Unit tests for DAOs
-│                   └── PersonDAOTest.java
 ├── pom.xml                           # Maven configuration
 └── README.md                         # You're reading it! 😊
 ```
@@ -103,8 +99,8 @@ contactapp/
    ```
 
 2. **Configure the Database**:
-    - Update `dbConnection.java` with your database connection details (URL, username, password).
-    - Ensure the `person` table exists with columns: `id`, `lastname`, `firstname`, `nickname`, `phone_number`, `address`, `email_address`, `birth_date`, `image_path`.
+   - Update `dbConnection.java` with your database connection details (URL, username, password).
+   - Ensure the `person` table exists with columns: `id`, `lastname`, `firstname`, `nickname`, `phone_number`, `address`, `email_address`, `birth_date`, `image_path`.
 
 3. **Install Dependencies**:
    ```bash
@@ -112,7 +108,7 @@ contactapp/
    ```
 
 4. **Java 23 Notes**:
-    - If using Java 23, update Mockito and Byte Buddy in `pom.xml` to versions supporting Java 23 (e.g., Mockito 5.14.0+, Byte Buddy 1.15.7+), or downgrade to Java 17 for full compatibility with current dependencies.
+   - If using Java 23, update Mockito and Byte Buddy in `pom.xml` to versions supporting Java 23 (e.g., Mockito 5.14.0+, Byte Buddy 1.15.7+), or downgrade to Java 17 for full compatibility with current dependencies.
 
 ---
 
@@ -124,10 +120,10 @@ contactapp/
    ```
 
 2. **Default Entry Point**:
-    - The `MainApp` class launches the application, starting at the `home-page.fxml`.
+   - The `MainApp` class launches the application, starting at the `home-page.fxml`.
 
 3. **Expected Output**:
-    - A window opens with the Home page, offering "View Contacts" and "Add Contact" options.
+   - A window opens with the Home page, offering "View Contacts" and "Add Contact" options.
 
 ---
 
@@ -149,25 +145,43 @@ contactapp/
 ## Usage 📋
 
 1. **Home Page**:
-    - Click "View Contacts" to see all contacts.
-    - Click "Add Contact" to create a new contact.
+   - Click "View Contacts" to see all contacts.
+   - Click "Add Contact" to create a new contact.
 
 2. **Add Contact**:
-    - Fill in required fields (last name, first name, phone number).
-    - Optionally add nickname, address, email, birth date, and an image.
-    - Save to store the contact or cancel to return home.
+   - Fill in required fields (last name, first name, phone number).
+   - Optionally add nickname, address, email, birth date, and an image.
+   - Save to store the contact or cancel to return home.
 
 3. **View All Contacts**:
-    - Browse contacts in a table.
-    - Search by name or phone number.
-    - Double-click a contact to view/edit details.
-    - Select a contact and click "Delete" to remove it.
+   - Browse contacts in a table.
+   - Search by name or phone number.
+   - Double-click a contact to view/edit details.
+   - Select a contact and click "Delete" to remove it.
 
 4. **Edit Contact**:
-    - Update contact details and save or cancel to revert changes.
+   - Update contact details and save or cancel to revert changes.
 
 5. **Delete Contact**:
-    - Confirm deletion; successful deletion returns to the all contacts page.
+   - Confirm deletion; successful deletion returns to the all contacts page.
+
+---
+
+## Screenshots 📸
+
+Here are some screenshots showcasing the **ContactApp** in action!
+
+### Home Page
+![Home Page](src/main/resources/org/project/contactapp/images/home.png)
+
+### All Contacts Page
+![All Contacts](src/main/resources/org/project/contactapp/images/allcontacts.png)
+
+### Add Contact Page
+![Add Contact](src/main/resources/org/project/contactapp/images/add_contact.png)
+
+### Contact Details Page
+![Contact Details](src/main/resources/org/project/contactapp/images/contact_details.png)
 
 ---
 
@@ -206,4 +220,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 Happy coding, and enjoy managing your contacts with ContactApp! 💼
 
---- 
+---
